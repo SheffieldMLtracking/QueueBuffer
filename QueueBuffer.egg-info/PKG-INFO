@@ -1,0 +1,12 @@
+Metadata-Version: 1.1
+Name: QueueBuffer
+Version: 1.1
+Summary: A buffer/queue in which the last few items are available for accessing using stable indices.
+Home-page: https://github.com/lionfish0/QueueBuffer.git
+Author: Mike Smith
+Author-email: m.t.smith@sheffield.ac.uk
+License: UNKNOWN
+Download-URL: https://github.com/lionfish0/QueueBuffer.git
+Description: UNKNOWN
+Keywords: queue,buffer
+Platform: UNKNOWN
