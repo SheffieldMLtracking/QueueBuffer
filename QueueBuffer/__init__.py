@@ -15,10 +15,14 @@ class QueueBuffer():
         self.index = 0 #index of next item to be added.
         self.buffer = [] #the buffer we will store things in.
         self.size = size #the maximum size of the buffer
-        self.newitem = threading.Event() #a blocking event to control the pop method
+        self.newitem = queue.Queue() #a blocking event to control the pop method
         t = threading.Thread(target=self.worker) #the worker that will run when items are added.
         t.start() #start the worker
         self.newitemindex = 0 #index of items to pop
+        
+    def unpopped(self):
+        """Return the number of items still to pop"""
+        return self.newitem.qsize()
         
     def worker(self):
         """
@@ -31,7 +35,7 @@ class QueueBuffer():
             self.index += 1 #index of next item for buffer
             if len(self.buffer)>self.size:
                 del self.buffer[0]
-            self.newitem.set()
+            self.newitem.put(None)
             
     def put(self,item):
         """
@@ -60,8 +64,8 @@ class QueueBuffer():
         !Item remains in the QueueBuffer, so 'pop' is slightly misleading.
         
         It will return (index,None) if the item has already been lost from the buffer."""
-        self.newitem.wait()
-        if self.newitemindex+1==self.index: self.newitem.clear()
+        self.newitem.get() #blocks until an item is added, using a queue for this to ensure that only one worker is triggered.
+        #if self.newitemindex+1==self.index: self.newitem.clear()
         index = self.newitemindex
         item = self.read(index)
         self.newitemindex += 1
