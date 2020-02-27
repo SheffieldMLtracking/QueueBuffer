@@ -1,4 +1,4 @@
-import queue
+from multiprocessing import Queue
 import threading
 
 class QueueBuffer():
@@ -11,11 +11,11 @@ class QueueBuffer():
         The constructor takes one optional argument, size, which means older items
         are deleted."""
         
-        self.inbound = queue.Queue() #an internal queue to manage the class properly in a thread safe manner.
+        self.inbound = Queue() #an internal queue to manage the class properly in a thread safe manner.
         self.index = 0 #index of next item to be added.
         self.buffer = [] #the buffer we will store things in.
         self.size = size #the maximum size of the buffer
-        self.newitem = queue.Queue() #a blocking event to control the pop method
+        self.newitem = Queue() #a blocking event to control the pop method
         t = threading.Thread(target=self.worker) #the worker that will run when items are added.
         t.start() #start the worker
         self.newitemindex = 0 #index of items to pop
