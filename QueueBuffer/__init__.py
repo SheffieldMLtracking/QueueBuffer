@@ -1,4 +1,4 @@
-from multiprocessing import Queue
+from multiprocessing import Queue, Value
 import threading
 
 class QueueBuffer():
@@ -12,7 +12,7 @@ class QueueBuffer():
         are deleted."""
         
         self.inbound = Queue() #an internal queue to manage the class properly in a thread safe manner.
-        self.index = 0 #index of next item to be added.
+        self.index = Value('i',0) #index of next item to be added.
         self.buffer = [] #the buffer we will store things in.
         self.size = size #the maximum size of the buffer
         self.newitem = Queue() #a blocking event to control the pop method
@@ -20,10 +20,14 @@ class QueueBuffer():
         t.start() #start the worker
         self.newitemindex = 0 #index of items to pop
         
+    def len(self):
+        """Get the number of items that have been added. This doesn't mean they all remain!"""
+        return self.index.value
+        
     def unpopped(self):
         """Return the number of items still to pop"""
         return self.newitem.qsize()
-        
+    
     def worker(self):
         """
         Helper function, internally blocks until an item is added to the internal
@@ -32,7 +36,7 @@ class QueueBuffer():
         while True:
             item = self.inbound.get()
             self.buffer.append(item)
-            self.index += 1 #index of next item for buffer
+            self.index.value = self.index.value + 1 #index of next item for buffer
             if len(self.buffer)>self.size:
                 del self.buffer[0]
             self.newitem.put(None)
@@ -50,7 +54,7 @@ class QueueBuffer():
             print("Indicies are non-negative")
             return None
         try:
-            bufinx = len(self.buffer)+(getindex - self.index)
+            bufinx = len(self.buffer)+(getindex - self.index.value)
             if bufinx<0:
                 print("This item has been deleted, try increasing the queue size")
                 return None
