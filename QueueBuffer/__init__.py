@@ -1,4 +1,4 @@
-from multiprocessing import Queue, Value
+from multiprocessing import Queue, Value, Manager
 import threading
 
 class QueueBuffer():
@@ -13,7 +13,9 @@ class QueueBuffer():
         
         self.inbound = Queue() #an internal queue to manage the class properly in a thread safe manner.
         self.index = Value('i',0) #index of next item to be added.
-        self.buffer = [] #the buffer we will store things in.
+        self.manager = Manager()
+        
+        self.buffer = self.manager.list() #the buffer we will store things in.
         self.size = size #the maximum size of the buffer
         self.newitem = Queue() #a blocking event to control the pop method
         t = threading.Thread(target=self.worker) #the worker that will run when items are added.
