@@ -53,16 +53,16 @@ class QueueBuffer():
     def read(self,getindex):
         """Read item at index getindex. Returns the item. Fails if item no longer exists."""
         if getindex<0:
-            print("Indicies are non-negative")
+            #print("Indicies are non-negative")
             return None
         try:
             bufinx = len(self.buffer)+(getindex - self.index.value)
             if bufinx<0:
-                print("This item has been deleted, try increasing the queue size")
+                #print("This item has been deleted, try increasing the queue size")
                 return None
             return self.buffer[bufinx]
         except IndexError:
-            print("This item doesn't exist yet")
+            #print("This item doesn't exist yet")
             return None
         
     def pop(self):
