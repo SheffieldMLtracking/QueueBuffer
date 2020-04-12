@@ -36,18 +36,21 @@ class QueueBuffer():
         queue, this is then added into our buffer, and various indices are sorted.
         """
         while True:
-            item = self.inbound.get()
-            self.buffer.append(item)
-            self.index.value = self.index.value + 1 #index of next item for buffer
-            if len(self.buffer)>self.size:
-                del self.buffer[0]
-            self.newitem.put(None)
+            item,index = self.inbound.get()
+            if index is None:
+                self.buffer.append(item)
+                self.index.value = self.index.value + 1 #index of next item for buffer
+                if len(self.buffer)>self.size:
+                    del self.buffer[0]
+                self.newitem.put(None)
+            else:
+                self.buffer[len(self.buffer)+(index - self.index.value)] = item
             
-    def put(self,item):
+    def put(self,item,index=None):
         """
         Add an item to the queue. 
         """
-        self.inbound.put(item)
+        self.inbound.put((item,index))
         
               
     def read(self,getindex):
